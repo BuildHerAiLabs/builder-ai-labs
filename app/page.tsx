@@ -60,9 +60,11 @@ function Navigation() {
             <a href="#founders" className="text-sm text-muted-foreground hover:text-primary transition-colors">Founders</a>
             <a href="#contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">Contact</a>
           </nav>
-          <Button className="gradient-primary text-white border-0 hover:opacity-90 transition-opacity">
-            Join Community
-            <ArrowRight className="w-4 h-4 ml-2" />
+          <Button asChild className="gradient-primary text-white border-0 hover:opacity-90 transition-opacity">
+            <a href="#contact">
+              Join Community
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </a>
           </Button>
         </div>
       </div>
@@ -98,9 +100,11 @@ function HeroSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="gradient-primary text-white border-0 hover:opacity-90 transition-opacity px-8 py-6 text-lg">
-              Join The Community
-              <ArrowRight className="w-5 h-5 ml-2" />
+            <Button asChild size="lg" className="gradient-primary text-white border-0 hover:opacity-90 transition-opacity px-8 py-6 text-lg">
+              <a href="#contact">
+                Join The Community
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </a>
             </Button>
             <Button size="lg" variant="outline" className="border-2 border-accent text-accent hover:bg-accent hover:text-white px-8 py-6 text-lg">
               Attend Next Build Session
@@ -678,11 +682,18 @@ function ContactSection() {
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault()
 
-  await fetch("/api/join-community", {
+  const response = await fetch("/api/join-community", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),
   })
+
+  const result = await response.json()
+
+  if (!response.ok) {
+    alert(result.error || "We could not send your message right now.")
+    return
+  }
 
   alert("Thanks for joining 🚀")
 }
