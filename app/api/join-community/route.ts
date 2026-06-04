@@ -2,6 +2,18 @@ import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 import nodemailer from "nodemailer"
 
+function getEnvValue(...keys: string[]) {
+    for (const key of keys) {
+        const value = process.env[key]?.trim()
+
+        if (value) {
+            return value.replace(/^"|"$/g, "")
+        }
+    }
+
+    return undefined
+}
+
 export async function POST(req: Request) {
     try {
         const {
@@ -26,19 +38,33 @@ export async function POST(req: Request) {
             throw error
         }
 
+        const smtpHost = getEnvValue("SMTP_HOST")
+        const smtpPort = Number(getEnvValue("SMTP_PORT") || "587")
+        const smtpUser = getEnvValue("SMTP_USER")
+        const smtpPass = getEnvValue("SMTP_PASS")
+        const recipientEmail = getEnvValue("CONTACT_EMAIL", "SMTP_USER", "EMAIL_USER")
+
+        if (!smtpHost || !smtpUser || !smtpPass) {
+            throw new Error("Missing SMTP configuration")
+        }
+
+        if (!recipientEmail) {
+            throw new Error("Missing recipient email configuration")
+        }
+
         const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: Number(process.env.SMTP_PORT),
+            host: smtpHost,
+            port: smtpPort,
             secure: false,
             auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
+                user: smtpUser,
+                pass: smtpPass,
             },
         })
 
         await transporter.sendMail({
-            from: process.env.SMTP_USER,
-            to: process.env.CONTACT_EMAIL,
+            from: smtpUser,
+            to: recipientEmail,
             replyTo: email,
             subject: "New BuildHer AI Community Signup",
             html: `
