@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
+
 // Logo Component
 function Logo({ className = "" }: { className?: string }) {
   return (
@@ -679,24 +680,46 @@ function ContactSection() {
     message: ''
   })
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState("")
 
-  const response = await fetch("/api/join-community", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formData),
-  })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  const result = await response.json()
+    setLoading(true)
+    setError("")
+    setSuccess(false)
 
-  if (!response.ok) {
-    alert(result.error || "We could not send your message right now.")
-    return
+    try {
+      const response = await fetch("/api/join-community", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setSuccess(true)
+        setFormData({
+          name: '',
+          email: '',
+          occupation: '',
+          aiInterest: '',
+          message: ''
+        })
+      } else {
+        setError(data.error || "Failed to submit form")
+      }
+    } catch {
+      setError("Something went wrong. Please try again.")
+    } finally {
+      setLoading(false)
+    }
   }
-
-  alert("Thanks for joining 🚀")
-}
 
   return (
     <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F0E4FF]">
@@ -770,12 +793,31 @@ const handleSubmit = async (e: React.FormEvent) => {
     className="w-full px-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
   />
 </div>
-         
-         
-              
-              <Button type="submit" size="lg" className="w-full gradient-primary text-white border-0 hover:opacity-90 transition-opacity">
-                Join The Community
-                <ArrowRight className="w-5 h-5 ml-2" />
+
+              {success && (
+                <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4">
+                  <p className="font-medium text-green-700">
+                    Thank you for joining BuildHer AI Labs!
+                  </p>
+                  <p className="text-sm text-green-600">
+                    Your information has been submitted successfully. We will be in touch soon.
+                  </p>
+                </div>
+              )}
+
+              {error && (
+                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <p className="text-red-700">{error}</p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                size="lg"
+                disabled={loading}
+                className="w-full gradient-primary text-white border-0 hover:opacity-90 transition-opacity"
+              >
+                {loading ? "Submitting..." : "Join Community"}
               </Button>
             </form>
           </CardContent>
