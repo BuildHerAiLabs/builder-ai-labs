@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 import {
   Sparkles,
@@ -538,6 +539,7 @@ const founders = [
     name: "Beth Mwangi",
     role: "Co-Founder",
     bio: "Passionate about empowering women in technology and AI innovation.",
+    image: "/beth-mwangi.jpg",
     linkedin: "https://www.linkedin.com/in/beth-mwangi/",
     instagram: "https://www.instagram.com/buildherailabs/",
     x: "https://x.com/BuildHerAILabs"
@@ -546,6 +548,7 @@ const founders = [
     name: "Valentine Rutto",
     role: "Co-Founder",
     bio: "Building communities that inspire women to create with technology.",  
+    image: "/valentine-rutto.jpeg",
     linkedin: "https://www.linkedin.com/in/valentine-rutto/",
     instagram: "https://www.instagram.com/buildherailabs/",
     x: "https://x.com/BuildHerAILabs"
@@ -561,24 +564,28 @@ function FoundersSection() {
           <p className="text-muted-foreground max-w-2xl mx-auto">The visionaries behind BuildHer AI Labs</p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+        <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
           {founders.map((founder, index) => (
-            <Card key={index} className="bg-card border-border shadow-lg overflow-hidden">
-              <CardContent className="p-8 text-center">
-                <div className="w-24 h-24 mx-auto rounded-full bg-secondary/50 flex items-center justify-center mb-6">
-                  <span className="text-3xl font-bold text-primary">
-                    {founder.name.split(' ').map(n => n[0]).join('')}
-                  </span>
+            <Card key={index} className="bg-card border-border shadow-lg overflow-hidden rounded-3xl">
+              <CardContent className="p-10 text-center">
+                <div className="w-40 h-40 mx-auto rounded-3xl overflow-hidden bg-secondary/40 mb-8 shadow-md">
+                  <Image
+                    src={founder.image}
+                    alt={founder.name}
+                    width={160}
+                    height={160}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-1">{founder.name}</h3>
-                <p className="text-sm text-primary font-medium mb-4">{founder.role}</p>
-                <p className="text-muted-foreground text-sm">{founder.bio}</p>
-               <div className="flex items-center justify-center gap-4 mt-6">
+                <h3 className="text-2xl font-semibold text-foreground mb-2">{founder.name}</h3>
+                <p className="text-base text-primary font-medium mb-5">{founder.role}</p>
+                <p className="text-muted-foreground text-base leading-relaxed">{founder.bio}</p>
+               <div className="flex items-center justify-center gap-4 mt-8">
   <a
     href={founder.linkedin}
     target="_blank"
     rel="noopener noreferrer"
-    className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-colors"
+    className="w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-colors"
   >
     <Linkedin className="w-5 h-5" />
   </a>
@@ -587,7 +594,7 @@ function FoundersSection() {
     href={founder.instagram}
     target="_blank"
     rel="noopener noreferrer"
-    className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-colors"
+    className="w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-colors"
   >
     <Instagram className="w-5 h-5" />
   </a>
@@ -596,7 +603,7 @@ function FoundersSection() {
     href={founder.x}
     target="_blank"
     rel="noopener noreferrer"
-    className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-colors"
+    className="w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-colors"
   >
     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -671,6 +678,14 @@ function AnnouncementsSection() {
 }
 
 // Contact Form Section
+const emptyFieldErrors = {
+  name: "",
+  email: "",
+  occupation: "",
+  aiInterest: "",
+  message: "",
+}
+
 function ContactSection() {
   const [formData, setFormData] = useState({
     name: '',
@@ -683,9 +698,31 @@ function ContactSection() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
+  const [errors, setErrors] = useState(emptyFieldErrors)
+
+  const updateField = (field: keyof typeof formData, value: string) => {
+    setFormData((current) => ({ ...current, [field]: value }))
+    setErrors((current) => ({ ...current, [field]: "" }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const newErrors = {
+      name: !formData.name.trim() ? "Name is required" : "",
+      email: !formData.email.trim() ? "Email is required" : "",
+      occupation: !formData.occupation.trim() ? "Occupation is required" : "",
+      aiInterest: !formData.aiInterest.trim() ? "AI Interest is required" : "",
+      message: !formData.message.trim() ? "Message is required" : "",
+    }
+
+    setErrors(newErrors)
+
+    const hasErrors = Object.values(newErrors).some((fieldError) => fieldError !== "")
+
+    if (hasErrors) {
+      return
+    }
 
     setLoading(true)
     setError("")
@@ -711,6 +748,7 @@ function ContactSection() {
           aiInterest: '',
           message: ''
         })
+        setErrors(emptyFieldErrors)
       } else {
         setError(data.error || "Failed to submit form")
       }
@@ -737,21 +775,29 @@ function ContactSection() {
                   <label className="block text-sm font-medium text-foreground mb-2">Name</label>
                   <Input 
                     type="text" 
+                    required
                     placeholder="Your name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-background border-border focus:border-primary"
+                    onChange={(e) => updateField("name", e.target.value)}
+                    className={`bg-background ${errors.name ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"}`}
                   />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">Email</label>
                   <Input 
                     type="email" 
+                    required
                     placeholder="your@email.com"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="bg-background border-border focus:border-primary"
+                    onChange={(e) => updateField("email", e.target.value)}
+                    className={`bg-background ${errors.email ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"}`}
                   />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+                  )}
                 </div>
               </div>
               
@@ -761,11 +807,15 @@ function ContactSection() {
   </label>
   <Input
     type="text"
+    required
     placeholder="e.g. Student, Developer, Designer, Founder"
     value={formData.occupation}
-    onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-    className="bg-background border-border focus:border-primary"
+    onChange={(e) => updateField("occupation", e.target.value)}
+    className={`bg-background ${errors.occupation ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"}`}
   />
+  {errors.occupation && (
+    <p className="mt-1 text-sm text-red-500">{errors.occupation}</p>
+  )}
 </div>
 
 <div>
@@ -774,11 +824,15 @@ function ContactSection() {
   </label>
   <textarea
     rows={4}
+    required
     placeholder="Tell us what interests you about AI and what you'd like to build..."
     value={formData.aiInterest}
-    onChange={(e) => setFormData({ ...formData, aiInterest: e.target.value })}
-    className="w-full px-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+    onChange={(e) => updateField("aiInterest", e.target.value)}
+    className={`w-full px-4 py-3 rounded-lg bg-background border focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none ${errors.aiInterest ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"}`}
   />
+  {errors.aiInterest && (
+    <p className="mt-1 text-sm text-red-500">{errors.aiInterest}</p>
+  )}
 </div>
 
 <div>
@@ -787,11 +841,15 @@ function ContactSection() {
   </label>
   <textarea
     rows={5}
+    required
     placeholder="Tell us about yourself and what you'd like to build..."
     value={formData.message}
-    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-    className="w-full px-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+    onChange={(e) => updateField("message", e.target.value)}
+    className={`w-full px-4 py-3 rounded-lg bg-background border focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none ${errors.message ? "border-red-500 focus:border-red-500" : "border-border focus:border-primary"}`}
   />
+  {errors.message && (
+    <p className="mt-1 text-sm text-red-500">{errors.message}</p>
+  )}
 </div>
 
               {success && (

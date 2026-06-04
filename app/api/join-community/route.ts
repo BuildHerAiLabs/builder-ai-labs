@@ -24,14 +24,36 @@ export async function POST(req: Request) {
             message,
         } = await req.json()
 
+        const normalizedFields = {
+            name: typeof name === "string" ? name.trim() : "",
+            email: typeof email === "string" ? email.trim() : "",
+            occupation: typeof occupation === "string" ? occupation.trim() : "",
+            aiInterest: typeof aiInterest === "string" ? aiInterest.trim() : "",
+            message: typeof message === "string" ? message.trim() : "",
+        }
+
+        const missingField = Object.entries(normalizedFields).find(([, value]) => !value)?.[0]
+
+        if (missingField) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: `${missingField} is required`,
+                },
+                {
+                    status: 400,
+                }
+            )
+        }
+
         const { error } = await supabase
             .from("community_members")
             .insert({
-                name,
-                email,
-                occupation,
-                ai_interest: aiInterest,
-                message,
+                name: normalizedFields.name,
+                email: normalizedFields.email,
+                occupation: normalizedFields.occupation,
+                ai_interest: normalizedFields.aiInterest,
+                message: normalizedFields.message,
             })
 
         if (error) {
@@ -65,20 +87,20 @@ export async function POST(req: Request) {
         await transporter.sendMail({
             from: smtpUser,
             to: recipientEmail,
-            replyTo: email,
+            replyTo: normalizedFields.email,
             subject: "New BuildHer AI Community Signup",
             html: `
         <h2>New Community Signup</h2>
 
-        <p><b>Name:</b> ${name}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Occupation:</b> ${occupation}</p>
+                <p><b>Name:</b> ${normalizedFields.name}</p>
+                <p><b>Email:</b> ${normalizedFields.email}</p>
+                <p><b>Occupation:</b> ${normalizedFields.occupation}</p>
 
         <p><b>AI Interest:</b></p>
-        <p>${aiInterest}</p>
+                <p>${normalizedFields.aiInterest}</p>
 
         <p><b>Message:</b></p>
-        <p>${message}</p>
+                <p>${normalizedFields.message}</p>
       `,
         })
 
