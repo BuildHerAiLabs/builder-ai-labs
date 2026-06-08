@@ -26,7 +26,10 @@ export async function POST(req: Request) {
 
         const normalizedFields = {
             name: typeof name === "string" ? name.trim() : "",
-            email: typeof email === "string" ? email.trim() : "",
+            email:
+                typeof email === "string"
+                    ? email.trim().toLowerCase()
+                    : "",
             occupation: typeof occupation === "string" ? occupation.trim() : "",
             aiInterest: typeof aiInterest === "string" ? aiInterest.trim() : "",
             message: typeof message === "string" ? message.trim() : "",
@@ -42,6 +45,29 @@ export async function POST(req: Request) {
                 },
                 {
                     status: 400,
+                }
+            )
+        }
+
+        const { data: existingMember, error: lookupError } = await supabase
+            .from("community_members")
+            .select("id")
+            .eq("email", normalizedFields.email.toLowerCase())
+            .maybeSingle()
+
+        if (lookupError) {
+            throw lookupError
+        }
+
+        if (existingMember) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    alreadyJoined: true,
+                    error: "We already have you in the BuildHer AI Labs community 💜. Keep an eye on your inbox for updates, events, and opportunities.",
+                },
+                {
+                    status: 409,
                 }
             )
         }
