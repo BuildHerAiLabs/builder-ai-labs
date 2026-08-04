@@ -435,6 +435,16 @@ const upcomingEvents = [
   }
 ]
 
+const pastEvents = [
+  {
+    title: "Prompt Engineering 101: Build Your Portfolio Website with AI",
+    image: "/prompt-engineering-101-event.png",
+    date: "24 June, 2026",
+    speaker: "Valentine Rutto",
+    description: "A hands-on session where we learned how to use AI tools to design, build, and launch a personal portfolio website, even as a beginner.",
+  },
+]
+
 function EventsSection() {
   return (
     <section id="events" className="py-20 px-4 sm:px-6 lg:px-8">
@@ -443,7 +453,7 @@ function EventsSection() {
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">Upcoming Community Events</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">Workshops, AI build sessions, and future hackathons.</p>
         </div>
-        
+
         <div className="grid md:grid-cols-3 gap-6">
           {upcomingEvents.map((event, index) => (
             <Card key={index} className="bg-card border-border shadow-md hover:shadow-lg transition-all">
@@ -451,8 +461,8 @@ function EventsSection() {
                 {/* Badge */}
                 <div className="mb-4">
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                    event.type === 'Workshop' 
-                      ? 'bg-accent/15 text-accent' 
+                    event.type === 'Workshop'
+                      ? 'bg-accent/15 text-accent'
                       : event.type === 'Build Session'
                       ? 'bg-secondary/60 text-primary'
                       : 'bg-accent/15 text-accent'
@@ -460,13 +470,13 @@ function EventsSection() {
                     {event.type}
                   </span>
                 </div>
-                
+
                 {/* Title */}
                 <h3 className="text-xl font-semibold text-foreground mb-3">{event.title}</h3>
-                
+
                 {/* Description */}
                 <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-grow">{event.description}</p>
-                
+
                 {/* Date and Location */}
                 <div className="space-y-2 mb-6">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -478,14 +488,49 @@ function EventsSection() {
                     <span>{event.location}</span>
                   </div>
                 </div>
-                
+
                 {/* Notify Me Button */}
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full border-primary text-primary hover:bg-primary/5 hover:text-primary"
                 >
                   Notify Me
                 </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Past Events */}
+        <div className="text-center mt-20 mb-12">
+          <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">Past Events</h3>
+          <p className="text-muted-foreground max-w-2xl mx-auto">A look back at events we&apos;ve hosted for the community.</p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {pastEvents.map((event, index) => (
+            <Card key={index} className="bg-card border-border shadow-md hover:shadow-lg transition-all overflow-hidden">
+              <div className="relative w-full aspect-square">
+                <Image
+                  src={event.image}
+                  alt={event.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <CardContent className="p-6">
+                <h4 className="text-lg font-semibold text-foreground mb-2">{event.title}</h4>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4">{event.description}</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="w-4 h-4 text-muted-foreground/70" />
+                    <span>{event.date}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Users className="w-4 h-4 text-muted-foreground/70" />
+                    <span>Speaker: {event.speaker}</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           ))}
